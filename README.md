@@ -4,7 +4,10 @@
 
 This is a pure python script to remove files from one or more directories.
 
-I wrote it because I had made a backup of my phone photos in dropbox, and another in Google Drive and then I bought a
+Filenames are not used to compare files.
+The leftmost paths take precedent, so the copy you wish to keep should be in the first path you pass.
+
+I wrote it because I had made a backup of my phone photos in dropbox, and another in Google Drive, and then I bought a
 NAS and decided to cut out the other services.
 The NAS also backs up my phone photos, so I had three copies of some things.
 
@@ -25,7 +28,7 @@ I recommend [asdf-vm](https://asdf-vm.com/) to manage local python versions, or 
 
 ## Options
 
-`python_rm_duplicates$ python rm_duplicates.py --help`
+`python rm_duplicates.py --help`
 
 ```
 usage: rm_duplicates.py [-h] [--recurse | --no-recurse | -r] [--dry_run | --no-dry_run | -d] [--verbose | --no-verbose | -v]
