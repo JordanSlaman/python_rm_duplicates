@@ -4,9 +4,6 @@ import csv
 import hashlib
 from pathlib import Path
 
-# argparse?
-# recursive?
-
 identify_outfile_pathname = './found.csv'
 
 
@@ -52,7 +49,7 @@ def identify(path_names=None,
 
                 if len(files_seen[file_hash]) != 1:
                     if verbose:
-                        print('Found duplicate:', files_seen[file_hash])
+                        print('Found duplicate:', (str(p) for p in files_seen[file_hash]))
             else:
                 if verbose:
                     print('Found directory:', file_path)

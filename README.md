@@ -8,7 +8,7 @@ I wrote it because I had made a backup of my phone photos in dropbox, and anothe
 NAS and decided to cut out the other services.
 The NAS also backs up my phone photos, so I had three copies of some things.
 
-There's a file `test.py' you can read and execute.
+There's a file `test.py` you can read and execute.
 You could comment out the cleanup step and verify assumptions yourself before running this on data you care about.
 
 There is also a `dry_run` flag that will not delete the files.
