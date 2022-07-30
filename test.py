@@ -5,7 +5,7 @@ import os
 from rm_duplicates import identify, remove
 
 base_pathname = os.path.realpath(__file__).rstrip('.py') + '/'
-identify_pathname = base_pathname + 'test_idenfify.csv'
+identify_path = base_pathname + 'test_idenfify.csv'
 
 test_data = {
     'path1': {
@@ -20,6 +20,12 @@ test_data = {
         'first_dupe3': 'coffee',
         'second_dupe': 'bagel',
         'remain': 'tea'
+    },
+    'path3': {  # all dupes, should be preserved with keep_empty_dirs
+        'first_dupe4': 'coffee',
+        'first_dupe5': 'coffee',
+        'second_dupe2': 'bagel',
+        'third_dupe': 'tea'
     }
 }
 
@@ -43,7 +49,7 @@ def setup_test():
 
 
 def verify_identify():
-    with open(identify_pathname, newline='') as csvfile:
+    with open(identify_path, newline='') as csvfile:
         identity_reader = csv.reader(csvfile)
         for row in identity_reader:
             for file_name in row[1:]:
@@ -79,17 +85,27 @@ if __name__ == '__main__':
     setup_test()
 
     identify(
-        path_names=[str(p) for p in test_paths],
-        identify_pathname=identify_pathname,
-        verbose=True
+        [str(p) for p in test_paths],
+        outfile=identify_path,
+        progress=True
     )
     verify_identify()
 
     remove(
+        infile=identify_path,
         dry_run=False,
-        identify_pathname=identify_pathname,
-        verbose=True
+        rm_empty_dirs=False,
+        progress=True
     )
     verify_remove()
 
     cleanup_test()
+
+# TODO: Testing...
+'''
+ - use unittest
+ - write test for each arg
+ - test for recurse flag
+    if isinstance(dict) in fixture?
+ - verify tempdir & cleanup works
+'''
