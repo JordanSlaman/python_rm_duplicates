@@ -18,7 +18,8 @@ def validate_and_return_passed_search_paths(path_names):
         path_names = [path_names]
 
     for path_name in path_names:
-        folder_path = Path(path_name)
+        folder_path = Path(path_name).expanduser()
+
         if not folder_path.exists():
             raise ValueError('Cannot find path:', path_name)
         else:
@@ -27,27 +28,18 @@ def validate_and_return_passed_search_paths(path_names):
     return search_paths
 
 
-def validate_identity_filepath(identify_pathname):
+def validate_identify_csv_path(identify_pathname):
+    if not identify_pathname:
+        identify_file = tempfile.NamedTemporaryFile(delete=False)
+        identify_pathname = identify_file.name
+
     # Validate Identify/Outfile Path
     identify_path = Path(identify_pathname)
-    if identify_path:
-        if not identify_path.parent.exists():
-            raise ValueError('Cannot find path for identity file:', identify_path.parent)
+    if not identify_path.parent.exists():
+        raise ValueError('Cannot find path for identity file:', identify_path.parent)
+
+    identify_path.touch(exist_ok=True)
     return identify_path
-
-
-def validate_in_out_identify_csv_paths(infile_name, outfile_name):
-    if not infile_name and not outfile_name:
-        identity_file = tempfile.NamedTemporaryFile()
-        return identity_file, identity_file
-
-    if infile_name:
-        identity_in_path = validate_identity_filepath(infile_name)
-        return identity_in_path, None
-
-    if outfile_name:
-        identify_out_path = validate_identity_filepath(outfile_name)
-        return identify_out_path, identify_out_path
 
 
 def human_timedelta(delta):
@@ -94,7 +86,7 @@ def progress_count_files(passed_paths, recurse=False):
 
 
 def identify(passed_path_names,
-             outfile=False,
+             outfile,
              recurse=False,
              progress=False):
     files_seen = defaultdict(list)
@@ -138,10 +130,10 @@ def identify(passed_path_names,
                              start_datetime=progress_init)
 
         else:
-            logging.info(f'Processed {files_processed} total files from {search_path}.')
+            logging.info(f'Processed {files_processed} total files from {search_path}')
 
     duplicate_list = [v for v in files_seen.values() if len(v) != 1]
-    logging.info(f'Files with copies found:', len(duplicate_list))
+    logging.info(f'Files with copies found: {len(duplicate_list)}')
 
     logging.info('Writing identified duplicates:', str(outfile))
 
@@ -162,7 +154,7 @@ def remove(infile,
     directories_seen = set()
     progress_init = datetime.datetime.now()
 
-    logging.info('Removing found duplicates from output:', infile)
+    logging.info(f'Removing found duplicates from identified duplicates file: {infile}')
 
     with open(infile, newline='') as csvfile:
         identity_reader = csv.reader(csvfile)
@@ -179,7 +171,7 @@ def remove(infile,
     progress_filecount = len(paths_to_remove)
 
     for file_path in paths_to_remove:
-        logging.info('Unlinking file:', file_path)
+        logging.info(f'Unlinking file: {file_path}{" - Dry Run!" if dry_run else ""}')
 
         if not dry_run:
             file_path.unlink()
@@ -197,7 +189,7 @@ def remove(infile,
                          total=progress_filecount,
                          start_datetime=progress_init)
 
-        logging.info(f'Removed {files_removed} files total.')
+    logging.info(f'Removed {files_removed} files total.')
 
 
 if __name__ == '__main__':
@@ -209,25 +201,28 @@ if __name__ == '__main__':
                         Skips file removal. You will be able to view and verify duplicates found with verbose mode or by
                         providing viewing the output csv file.
                         
+                        Running this command with verbose mode on will log the removal steps. Running it with verbose off
+                        completely skips removal.
+                                                
                         Duplicates found in the outfile are removed from right to left.
                         Only the first filepath in the list will be kept, so the order you pass your paths is important.
                         '''))
-    parser.add_argument('--outfile', '-o', type=str,
+    parser.add_argument('--found_duplicates_csv_filepath', '-f', type=str, metavar='./duplicates_found.csv',
+                        default=None,
                         help=inspect.cleandoc('''
                             Pass in a filepath to output identified duplicates to.
                             The output format is a .csv of duplicated paths.
+                            Only the first row (first file found in path order.) is preserved.
                             Removal will proceed using this file unless "--dry_run" is specified.
                             '''))
-    parser.add_argument('--cleanup_outfile', '-c', action=argparse.BooleanOptionalAction, default=False,
-                        help='Will remove the outfile from the identify step if flagged.')
-    parser.add_argument('--infile', '-i', type=str,
+    parser.add_argument('--skip_identification', '-s', action=argparse.BooleanOptionalAction, default=False,
                         help=inspect.cleandoc('''
-                        Pass in a filepath to process removals from.
-                        This option will skip the identification step.
+                        Uses the file provided by --found_duplicates_csv_filepath to process removals.
+                        This saves a lot of time iterating and hashing all files in the provided paths.
                         '''))
     parser.add_argument('--recurse', '-r', action=argparse.BooleanOptionalAction, default=False,
                         help='recurse into subdirectories')
-    parser.add_argument('--keep_empty_subdirs', '-k', action=argparse.BooleanOptionalAction, default=False,
+    parser.add_argument('--keep_empty_subdirectories', '-k', action=argparse.BooleanOptionalAction, default=False,
                         help='Will not delete a directory or if it is empty after file deduplication.')
     parser.add_argument('--progress', '-p', action=argparse.BooleanOptionalAction, default=False,
                         help=inspect.cleandoc('''
@@ -239,26 +234,29 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     script_start = datetime.datetime.now()
-    identity_in_file, identify_out_file = validate_in_out_identify_csv_paths(args.infile, args.outfile)
+    identified_csv_filepath = validate_identify_csv_path(args.found_duplicates_csv_filepath)
 
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
         logging.info("Beginning deduplication!")
 
-    if not args.infile:
+    if not args.skip_identification:
         identify(args.paths,
-                 outfile=identify_out_file,
+                 outfile=identified_csv_filepath,
                  recurse=args.recurse,
                  progress=args.progress)
-        Path(identify_out_file).unlink()  # deletes temporary directory
+    else:
+        logging.info(f"Skipping deduplication - Will remove from {identified_csv_filepath}")
 
-    elif args.cleanup_outfile:
-        Path(identify_out_file).unlink()
+        if not args.found_duplicates_csv_filepath:
+            Path(identified_csv_filepath).unlink()  # deletes temporary directory
 
-    remove(infile=identity_in_file,
-           dry_run=args.dry_run,
-           rm_empty_dirs=not args.keep_empty_subdirs,
-           progress=args.progress)
+    skip_removal = args.dry_run and not args.verbose
+    if not skip_removal:
+        remove(infile=identified_csv_filepath,
+               dry_run=args.dry_run,
+               rm_empty_dirs=not args.keep_empty_subdirectories,
+               progress=args.progress)
 
     if args.verbose:
         script_elapsed = datetime.datetime.now() - script_start
