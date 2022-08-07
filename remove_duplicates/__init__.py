@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import sys
 
-from modules import *
+from .modules import *
 
 if __name__ == '__main__':
     print(sys.argv)
@@ -41,7 +41,20 @@ if __name__ == '__main__':
 
     all_file_paths, total_filecount, progress_init_time = validate_passed_path_list(passed_path_names,
                                                                                     recurse)
+    # if not args.skip_identification:
+    # identify(
+    #     all_file_paths,
+    #     identified_csv_filepath,
+    #     recurse=args.recurse,
+    #     progress=args.progress
+    # )
 
-    identify(
-        args.
-    )
+    # skip_removal = args.dry_run and not args.verbose
+    # if not skip_removal:
+    #     remove(infile=identified_csv_filepath,
+    #            dry_run=args.dry_run,
+    #            rm_empty_dirs=not args.keep_empty_subdirectories,
+    #            progress=args.progress)
+    #
+    # script_elapsed = datetime.datetime.now() - PROGRESS_GLOBALS['total_start_datetime']
+    # logging.debug(f'Done! - Elapsed total time: {human_timedelta(script_elapsed)}')

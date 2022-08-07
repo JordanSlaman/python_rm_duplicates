@@ -2,7 +2,10 @@ import csv
 from pathlib import Path
 import os
 
-from rm_duplicates import identify, remove
+# from rm_duplicates import identify, remove
+
+from remove_duplicates import identify, remove
+
 
 base_pathname = os.path.realpath(__file__).rstrip('.py') + '/'
 identify_path = base_pathname + 'test_idenfify.csv'

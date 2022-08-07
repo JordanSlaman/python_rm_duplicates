@@ -1,5 +1,6 @@
 from collections import defaultdict
 import datetime
+import math
 
 # Progress
 # PROGRESS_GLOBALS = {
@@ -18,6 +19,7 @@ PROGRESS_TASKS = defaultdict(dict)
 
 PROGRESS_MINUTES_TO_REPORT = 1
 PROGRESS_PERCENTAGE_TO_REPORT = 5
+
 
 #
 # 'total': {
@@ -59,3 +61,12 @@ def human_timedelta(delta):
     for end in range(len(dhms) - 1, -1, -1):
         if not dhms[end].startswith('0'):
             return ', '.join(dhms[start:end + 1])
+
+
+def _report_percent(percent):
+    math.floor(3.1415)
+    return True
+
+
+def _report_elapsed(elapsed):
+    return True
