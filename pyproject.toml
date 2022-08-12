@@ -1,0 +1,24 @@
+#[project]
+#name = ""
+#version = "1.2.2"
+#authors = [
+#    { name = "Jordan Slaman", email = "jordan.slaman@gmail.com" },
+#]
+#description = "This is a pure python script to remove files from one or more directories."
+#readme = "README.md"
+#license = { file="LICENSE" }
+#requires-python = ">=3.9"
+#classifiers = [
+#    "Programming Language :: Python :: 3",
+#    "License :: OSI Approved :: MIT License",
+#    "Operating System :: OS Independent",
+#]
+#
+#
+#[build-system]
+#requires = ["setuptools>=61.0"]
+#build-backend = "setuptools.build_meta"
+
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools", "wheel"]

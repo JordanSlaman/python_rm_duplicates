@@ -20,11 +20,11 @@ def parse_args():
     parser.add_argument('--found_duplicates_csv_filepath', '-f', type=str, metavar='./duplicates_found.csv',
                         default=None,
                         help=inspect.cleandoc('''
-                                Pass in a filepath to output identified duplicates to.
-                                The output format is a .csv of duplicated paths.
-                                Only the first row (first file found in path order.) is preserved.
-                                Removal will proceed using this file unless "--dry_run" is specified.
-                                '''))
+                            Pass in a filepath to output identified duplicates to.
+                            The output format is a .csv of duplicated paths.
+                            Only the first row (first file found in path order.) is preserved.
+                            Removal will proceed using this file unless "--dry_run" is specified.
+                            '''))
     parser.add_argument('--skip_identification', '-s', action=argparse.BooleanOptionalAction, default=False,
                         help=inspect.cleandoc('''
                             Uses the file provided by --found_duplicates_csv_filepath to process removals.

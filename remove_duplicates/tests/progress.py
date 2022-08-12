@@ -1,8 +1,6 @@
 import unittest
 
-from remove_duplicates.modules import progress, human_timedelta
-
-from remove_duplicates.modules.progress import _report_percent, _report_elapsed
+from remove_duplicates.progress import _report_percent
 
 
 class ProgressTestCase(unittest.TestCase):

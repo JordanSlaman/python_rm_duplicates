@@ -2,15 +2,15 @@ import csv
 import logging
 from pathlib import Path
 
+from progress import progress_log
+
 
 def remove(infile,
            dry_run=False,
-           rm_empty_dirs=True,
-           progress=False):
+           rm_empty_dirs=True):
     files_removed = 0
     paths_to_remove = set()
     directories_seen = set()
-    # progress_init = datetime.datetime.now()
 
     logging.info(f'Removing found duplicates from identified duplicates file: {infile}')
 
@@ -41,10 +41,11 @@ def remove(infile,
                 except OSError:
                     pass
 
-        if progress:
-            progress(task_name=f'Removing Duplicates',
-                         processed_files=files_removed,
-                         total_files=progress_filecount,
-                         last_progress_percentage=0)
+        # todo
+        # total files != dupes progress...
+        progress_log(task_name=f'remove', qty_processed=files_removed)
+        # processed_files=files_removed,
+        # total_files=progress_filecount,
+        # last_progress_percentage=0)
 
     logging.info(f'Removed {files_removed} files total.')

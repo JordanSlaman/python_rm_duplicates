@@ -1,10 +1,10 @@
+import datetime
 import logging
 from pathlib import Path
 import tempfile
 
 
 def validate_passed_path_list(path_names, recurse=False):
-    # progress_init_time = datetime.datetime.now()
     logging.info(f'Processing passed paths into work list: {path_names}')
 
     all_dir_paths, all_file_paths = [], []
@@ -32,10 +32,10 @@ def validate_passed_path_list(path_names, recurse=False):
                     logging.debug(f'Found sub-directory: {file_path}/')
                     all_dir_paths.append(file_path)
 
-    all_dir_paths, total_filecount = len(all_dir_paths), len(all_file_paths)
-    logging.info(f'Found {total_filecount} files to hash check in {all_dir_paths} directories.')
+    # all_dir_paths, total_filecount = len(all_dir_paths), len(all_file_paths)
+    logging.info(f'Found {len(all_file_paths)} files to hash check in {len(all_dir_paths)} directories.')
 
-    return all_file_paths, total_filecount, progress_init_time
+    return all_file_paths
 
 
 def validate_csv(identify_pathname):

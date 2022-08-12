@@ -1,4 +1,4 @@
-# Python Remove Duplicate Files
+# Remove Duplicate Files Python
 
 ## About
 
@@ -11,14 +11,30 @@ I wrote it because I had made a backup of my phone photos in dropbox, and anothe
 NAS and decided to cut out the other services.
 The NAS also backs up my phone photos, so I had three copies of some things.
 
-There's a file `test.py` you can read and execute.
-You could comment out the cleanup step and verify assumptions yourself before running this on data you care about.
-
-## Requirements & Execution
+## Requirements
 
 Python 3.9 and above.
 
 I recommend [asdf-vm](https://asdf-vm.com/) to manage local python versions, or use what you're comfortable with.
+
+
+## Installation
+
+> python -m venv .venv
+> source .venv/bin/activate
+
+# usually...
+> python -m pip install --upgrade pip
+
+> python -m pip install remove-duplicates
+
+> python -m pip install /Users/jslaman/git/python_rm_duplicates/dist/remove-duplicates-1.2.1.tar.gz
+
+## Execution
+
+> python -m remove-duplicates -d
+
+
 
 `python rm_duplicates.py "~/Photos/Jordan's Phone" "/Volumes/old_backup/photos" -v -r -p`
 
@@ -62,23 +78,27 @@ options:
 This script contains 2 primary steps.
 
 1. Identify
-This step walks the paths provided in order and hashes all the files found. (and optionally continues into subdirectories with `--recurse`)
-It saves the identified paths to a .csv in a temporary folder if unspecified.
+   This step walks the paths provided in order and hashes all the files found. (and optionally continues into
+   subdirectories with `--recurse`)
+   It saves the identified paths to a .csv in a temporary folder if unspecified.
 
 You can provide a filepath for your own .csv to review before you commit to a removal.
-You would need to also use the `--dry_run` flag for this to prevent the 
+You would need to also use the `--dry_run` flag for this to prevent deletion.
+
+**The leftmost path in the .csv is the 'original' and will not be removed. Any further comma-separated values are identified as copies and would be removed in the removal step.**
 
 Relevant options:
+
 - paths (positional)
 - `-r` recurse
 - `-p` progress
 - `-v` verbose
 - `-f` found_duplicates_csv_filepath
 
-
 2. Remove
 
-Running this command with verbose mode on will log the removal steps. Running it with verbose off completely skips removal.
+Running this command with verbose mode on will log the removal steps. Running it with verbose off completely skips
+removal.
 
 - `-d` dry_run
 - `-r` recurse
@@ -87,11 +107,19 @@ Running this command with verbose mode on will log the removal steps. Running it
 - `-v` verbose
 - `-f` found_duplicates_csv_filepath
 
-
 ## Examples
 
 ### Identify to file
+
 > -f ./duplicates.csv -r -p -d "/Volumes/Backup/Photos/Jordan's Phone" "~/Jordan Dropbox/media/From Phone"
 
 ### Remove from file
+
 > -f ./duplicates.csv -r -p -s "/Volumes/Backup/Photos/Jordan's Phone" "~/Jordan Dropbox/media/From Phone"
+
+
+# Contribution
+
+## Building
+
+> python -m build
